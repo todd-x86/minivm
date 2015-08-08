@@ -1,0 +1,56 @@
+@def strlen(str): "msvcrt.dll"
+@def strcmp(str1, str2): "msvcrt.dll"
+@def printf(str, ...): "msvcrt.dll"
+
+s1 = "string1"
+s2 = "string2"
+result = strcmp(s1, s2)
+printf("'%s' and '%s' compared => %d\n", s1, s2, result)
+
+
+
+[opcodes]
+push_string 1
+push_string 0
+call strcmp@1
+store_result 0
+
+push_slot 0
+push_string 1
+push_string 0
+push_string 2
+call printf@2
+pop_result
+
+
+
+[Opcode types]
+00	push_string <bytecode-offset:2>
+01	call <index:2>
+02	store_result <slot:1>
+03	push_slot <slot:1>
+04	pop_result
+
+
+[[DLL block]]
+<dll-count:2> {
+	<dll-name:str>
+	<func-count:2> {
+		<func-name:str>
+	}
+}
+
+[[String block]]
+<str-count:2> {
+	<str-value:str>
+}
+
+
+
+[Bytecode structure]
+STRING TABLE
+DLL TABLE
+OPCODE TABLE
+4-BYTE STRING TABLE OFFSET
+4-BYTE DLL TABLE OFFSET
+4-BYTE OPCODE TABLE OFFSET

@@ -1,0 +1,7 @@
+extern <id>, <dll-file>, <function>
+pushf <float>
+pushd <double>
+pushi <int>
+pushb <byte>
+pop
+call <id>
