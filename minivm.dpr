@@ -19,9 +19,8 @@ var
  slots: array[0..255] of Pointer;
  OpTable: array[0..3] of TOpFunction;
  stackSz, stackIndex: Integer;
- oldEbp, oldEsp, oldEbx: Pointer;
+ oldEbp, oldEsp: Pointer;
  stack: array[0..4095] of Pointer;
- j:Integer;
 
 procedure AddStack(p: Pointer);
 begin
