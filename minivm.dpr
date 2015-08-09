@@ -108,15 +108,15 @@ end;
 
 begin
   fs := TFileStream.Create(ParamStr(0), fmOpenRead or fmShareDenyNone);
-  fs.Seek(-4, soEnd);
+  fs.Seek(-4, soFromEnd);
   fs.Read(sz, sizeof(Cardinal));
 
-  fs.Seek(-Integer(sz), soEnd);
+  fs.Seek(-Integer(sz), soFromEnd);
 
   // Ignore 3 offsets (DLL table offset, string table offset, file size offset)
   Dec(sz, 3*sizeof(Cardinal));
 
-  ops := AllocMem(sz);
+  GetMem(ops, sz);
   fs.Read(ops^, sz);
   fs.Read(dllOffset, sizeof(Cardinal));
   fs.Read(opOffset, sizeof(Cardinal));

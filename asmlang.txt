@@ -1,0 +1,30 @@
+;; DLLs
+.dll_start "msvcrt.dll"
+	.entry printf
+	.entry strcmp
+.dll_end
+
+
+;; String table
+.str_start
+	0: "string1"
+	1: "string2"
+	2: "'%s' and '%s' compared => %d\n"
+.str_end
+
+
+;; Opcodes
+.op_start
+
+push_string 1
+push_string 0
+call strcmp
+store_result 0
+
+push_slot 0
+push_string 1
+push_string 0
+push_string 2
+call printf
+
+.op_end

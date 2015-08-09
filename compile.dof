@@ -94,7 +94,7 @@ OutputDir=
 UnitOutputDir=
 PackageDLLOutputDir=
 PackageDCPOutputDir=
-SearchPath=C:\Users\Todd Suess\Desktop\downloads\dls42\LVCL
+SearchPath=C:\Users\Todd Suess\Desktop\downloads\dls7\smcmpnt\SOURCES
 Packages=vcl;rtl;vclx;vclactnband;vclshlctrls;vclie;xmlrtl;inetdbbde;inet;inetdbxpress;dbrtl;vcldb;adortl;bdertl;vcldbx;VclSmp;AbbreviaVCL;bw;cefcomponent;CPortLib7;CScriptRT;cyPack;AsyncPro;IndyCore70;IndySystem70;IndyProtocols70;rxctl;DelphiX70;doscmd;DSPack_D7;EkVCLD7;EmbeddedWebBrowser_D7;ExtLib_D6;GR32_D7;GR32_DSGN_D7;Hash;SDeanUtils;kr_graphic_d7;macprogress;minmax;NiceGridD7;PCK_ALCINOE;Python_d7;qdb_reg;sevenzip;sizectrl;SMCmpntD7;SynEdit_R7;tdbf_d7d;tdbf_d7r;TIE_http_https;TmySQL_Delphi5_Package;tzip;UbuntuProgressPackage;VirtualExplorerListviewExD7;VirtualShellToolsD7;VirtualTreesD7;xictls;CobComponents;mxCaptionBarButtons_d7;fundamentals_http;EasyListviewD7;kprocs7;adpvcl1;FMA70PRE;FMA70;OverbyteIcsD7Run;alrep70;FreeRep6;NicePreviewD7;JclDeveloperTools;Jcl;JclVcl;JclContainers;JvCore;JvSystem;JvStdCtrls;JvAppFrm;JvBands;JvDB;JvDlgs;JvBDE;JvControls;JvCmp;JvCrypt;JvCustom;JvDocking;JvDotNetCtrls;JvGlobus;JvHMI;JvJans;JvManagedThreads;JvMM;JvNet;JvPageComps;JvPascalInterpreter;JvPluginSystem;JvPrintPreview;JvRuntimeDesign;JvTimeFramework;JvWizards;JvXPCtrls
 Conditionals=
 DebugSourceDirs=
@@ -130,9 +130,3 @@ OriginalFilename=
 ProductName=
 ProductVersion=1.0.0.0
 Comments=
-[HistoryLists\hlUnitAliases]
-Count=1
-Item0=WinTypes=Windows;WinProcs=Windows;DbiTypes=BDE;DbiProcs=BDE;DbiErrs=BDE;
-[HistoryLists\hlSearchPath]
-Count=1
-Item0=C:\Users\Todd Suess\Desktop\downloads\dls42\LVCL
