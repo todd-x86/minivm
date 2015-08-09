@@ -12,15 +12,14 @@ printf("'%s' and '%s' compared => %d\n", s1, s2, result)
 [opcodes]
 push_string 1
 push_string 0
-call strcmp@1
+call strcmp@0
 store_result 0
 
 push_slot 0
 push_string 1
 push_string 0
 push_string 2
-call printf@2
-pop_result
+call printf@1
 
 
 
@@ -29,7 +28,36 @@ pop_result
 01	call <index:2>
 02	store_result <slot:1>
 03	push_slot <slot:1>
-04	pop_result
+
+[Bytecode structure]
+STRING TABLE
+	-strings delimited by \0
+DLL TABLE {
+	-01 -> DLL FILE
+	-02 -> FUNCTION NAME
+	-00 -> SEPARATOR
+}
+OPCODE TABLE
+4-BYTE DLL TABLE OFFSET
+4-BYTE OPCODE TABLE OFFSET
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 [[DLL block]]
@@ -51,6 +79,6 @@ pop_result
 STRING TABLE
 DLL TABLE
 OPCODE TABLE
-4-BYTE STRING TABLE OFFSET
 4-BYTE DLL TABLE OFFSET
 4-BYTE OPCODE TABLE OFFSET
+4-BYTE OPCODE TABLE END OFFSET
