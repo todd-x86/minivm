@@ -110,7 +110,8 @@ begin
   fs := TFileStream.Create(ParamStr(0), fmOpenRead or fmShareDenyNone);
   fs.Seek(-4, soEnd);
   fs.Read(sz, sizeof(Cardinal));
-  fs.Seek(-sz, soEnd);
+
+  fs.Seek(-Integer(sz), soEnd);
 
   // Ignore 3 offsets (DLL table offset, string table offset, file size offset)
   Dec(sz, 3*sizeof(Cardinal));
@@ -118,9 +119,7 @@ begin
   ops := AllocMem(sz);
   fs.Read(ops^, sz);
   fs.Read(dllOffset, sizeof(Cardinal));
-  MessageBox(0, PChar(IntToStr(dllOffset)), '', 0);
   fs.Read(opOffset, sizeof(Cardinal));
-  MessageBox(0, PChar(IntToStr(opOffset)), '', 0);
   fs.Free;
 
   stackIndex := High(stack)-1;
@@ -152,7 +151,7 @@ begin
   end;
 
   // Opcode execution
-  while Cardinal(ptr_op) < Cardinal(ptr_opEnd)-1 do begin
+  while Cardinal(ptr_op) < Cardinal(ptr_opEnd) do begin
     OpTable[ptr_op^]();
   end;
 end.
