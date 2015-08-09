@@ -16,16 +16,17 @@ var
  dllOffset, opOffset: Cardinal;
  dllHnd: Cardinal;
  dllFunc: TList;
- slots: array[0..255] of Byte;
+ slots: array[0..255] of Pointer;
  OpTable: array[0..3] of TOpFunction;
- stack: array[0..1023] of Pointer;
  stackSz, stackIndex: Integer;
- oldEbp, oldEsp: Pointer;
+ oldEbp, oldEsp, oldEbx: Pointer;
+ stack: array[0..4095] of Pointer;
+ j:Integer;
 
 procedure AddStack(p: Pointer);
 begin
   stack[stackIndex] := p;
-  Inc(stackIndex);
+  Dec(stackIndex);
 end;
 
 // Opcodes
@@ -50,22 +51,16 @@ begin
   Inc(ptr_op);
 
   // Function name on top of stack
-  stack[0] :=  dllFunc[PWord(ptr_op)^];
-
-  // For old EBP + ESP reg preservation
-  AddStack(Pointer(0));
-  AddStack(Pointer(0));
+  AddStack(dllFunc[PWord(ptr_op)^]);
 
   Inc(ptr_op, sizeof(Word));
 
-  sPtr := @stack;
+  sPtr := Pointer(Cardinal(@stack) + ((stackIndex+1)*sizeof(Pointer)));
   bPtr := Pointer(Cardinal(@stack) + (Sizeof(Pointer)*(stackSz-1)));
 
   // Push all operands from internal stack onto function stack
   asm
     // Preserve old EBP + ESP on top of stack ptr
-    //mov [bPtr+4], ebp
-    //mov [bPtr+8], esp
     mov [oldEbp], ebp
     mov [oldEsp], esp
 
@@ -76,9 +71,9 @@ begin
     mov esp, ecx
     mov ebp, edx
 
-    // Move function call from top of stack to [eax]
-    pop eax
-    call eax
+    // Move function call from top of stack to [edx]
+    pop edx
+    call edx
 
     // Store result
     mov [res], eax
@@ -86,13 +81,13 @@ begin
     mov esp, [oldEsp]
     mov ebp, [oldEbp]
   end;
-  stackIndex := 1;
+  stackIndex := High(stack);
 end;
 
 procedure Op_StoreResult;
 begin
   Inc(ptr_op);
-  slots[ptr_op^] := res;
+  slots[ptr_op^] := Pointer(res);
   Inc(ptr_op);
 end;
 
@@ -121,8 +116,7 @@ begin
   fs.Read(opOffset, sizeof(Cardinal));
   fs.Free;
 
-  stackSz := 1024;
-  stackIndex := 1;
+  stackIndex := High(stack)-1;
 
   // Initialize op table
   OpTable[0] := Op_PushString;
@@ -152,7 +146,6 @@ begin
 
   // Opcode execution
   while Cardinal(ptr_op) < Cardinal(ptr_opEnd)-1 do begin
-    Writeln(ptr_op^);
     OpTable[ptr_op^]();
   end;
 end.
