@@ -10,15 +10,15 @@ printf("'%s' and '%s' compared => %d\n", s1, s2, result)
 
 
 [opcodes]
-push_string 1
 push_string 0
+push_string 1
 call strcmp@0
 store_result 0
 
-push_slot 0
-push_string 1
-push_string 0
 push_string 2
+push_string 0
+push_string 1
+push_slot 0
 call printf@1
 
 

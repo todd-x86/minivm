@@ -18,7 +18,15 @@ var
  dllFunc: TList;
  slots: array[0..255] of Byte;
  OpTable: array[0..3] of TOpFunction;
- funcStack: TList;
+ stack: array[0..1023] of Pointer;
+ stackSz, stackIndex: Integer;
+ oldEbp, oldEsp: Pointer;
+
+procedure AddStack(p: Pointer);
+begin
+  stack[stackIndex] := p;
+  Inc(stackIndex);
+end;
 
 // Opcodes
 
@@ -26,51 +34,59 @@ procedure Op_PushString;
 begin
   Inc(ptr_op);
   // Add string virtual address
-  funcStack.Add(Pointer(PWord(ptr_op)^));
+  AddStack(Pointer(Cardinal(ptr_str)+PWord(ptr_op)^));
   Inc(ptr_op, sizeof(Word));
 end;
 
 procedure Op_Call;
-var j: Integer;
-    fPtr, oPtr: Pointer;
+var bPtr, sPtr: Pointer;
 begin
+  {
+    NOTES:
+      ESP < EBP
+      ESP++ when pop
+      ESP-- when push
+  }
   Inc(ptr_op);
-  fPtr := dllFunc[PWord(ptr_op)^];
+
+  // Function name on top of stack
+  stack[0] :=  dllFunc[PWord(ptr_op)^];
+
+  // For old EBP + ESP reg preservation
+  AddStack(Pointer(0));
+  AddStack(Pointer(0));
+
   Inc(ptr_op, sizeof(Word));
 
-  // Preserve eax
-  asm
-    push eax
-  end;
+  sPtr := @stack;
+  bPtr := Pointer(Cardinal(@stack) + (Sizeof(Pointer)*(stackSz-1)));
 
   // Push all operands from internal stack onto function stack
-  for j := funcStack.Count-1 downto 0 do begin
-    oPtr := funcStack[j];
-    asm
-      push oPtr
-    end;
-  end;
-
-  // Call DLL function
   asm
-    call fPtr
-  end;
+    // Preserve old EBP + ESP on top of stack ptr
+    //mov [bPtr+4], ebp
+    //mov [bPtr+8], esp
+    mov [oldEbp], ebp
+    mov [oldEsp], esp
 
-  // Move result to `res` for preservation
-  asm
+    // Set stack pointer + base pointer
+    mov ecx, sPtr
+    mov edx, bPtr
+
+    mov esp, ecx
+    mov ebp, edx
+
+    // Move function call from top of stack to [eax]
+    pop eax
+    call eax
+
+    // Store result
     mov [res], eax
-  end;
 
-  // Pop operands
-  for j := 0 to funcStack.Count-1 do asm
-    pop eax
+    mov esp, [oldEsp]
+    mov ebp, [oldEbp]
   end;
-  funcStack.Clear;
-
-  // Preserve eax
-  asm
-    pop eax
-  end;
+  stackIndex := 1;
 end;
 
 procedure Op_StoreResult;
@@ -83,7 +99,7 @@ end;
 procedure Op_PushSlot;
 begin
   Inc(ptr_op);
-  funcStack.Add(Pointer(slots[ptr_op^]));
+  AddStack(Pointer(slots[ptr_op^]));
   Inc(ptr_op);
 end;
 
@@ -104,6 +120,9 @@ begin
   fs.Read(dllOffset, sizeof(Cardinal));
   fs.Read(opOffset, sizeof(Cardinal));
   fs.Free;
+
+  stackSz := 1024;
+  stackIndex := 1;
 
   // Initialize op table
   OpTable[0] := Op_PushString;
@@ -132,8 +151,7 @@ begin
   end;
 
   // Opcode execution
-  funcStack := TList.Create;
-  while Cardinal(ptr_op) < Cardinal(ptr_opEnd) do begin
+  while Cardinal(ptr_op) < Cardinal(ptr_opEnd)-1 do begin
     Writeln(ptr_op^);
     OpTable[ptr_op^]();
   end;
