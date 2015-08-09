@@ -107,12 +107,20 @@ begin
 end;
 
 begin
-  fs := TFileStream.Create('simple2.b', fmOpenRead);
-  sz := fs.Size-(sizeof(Cardinal)*2);
+  fs := TFileStream.Create(ParamStr(0), fmOpenRead or fmShareDenyNone);
+  fs.Seek(-4, soEnd);
+  fs.Read(sz, sizeof(Cardinal));
+  fs.Seek(-sz, soEnd);
+
+  // Ignore 3 offsets (DLL table offset, string table offset, file size offset)
+  Dec(sz, 3*sizeof(Cardinal));
+
   ops := AllocMem(sz);
   fs.Read(ops^, sz);
   fs.Read(dllOffset, sizeof(Cardinal));
+  MessageBox(0, PChar(IntToStr(dllOffset)), '', 0);
   fs.Read(opOffset, sizeof(Cardinal));
+  MessageBox(0, PChar(IntToStr(opOffset)), '', 0);
   fs.Free;
 
   stackIndex := High(stack)-1;
